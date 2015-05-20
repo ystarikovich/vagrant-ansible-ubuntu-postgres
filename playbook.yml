@@ -51,8 +51,8 @@
       tags:
         - postgres
  
-    - name: change postgres DB user password to align
+    - name: change postgres DB user password to postgres
       sudo_user: postgres
-      postgresql_user: user=postgres password=align
+      postgresql_user: user=postgres password=postgres
       tags:
         - postgres
