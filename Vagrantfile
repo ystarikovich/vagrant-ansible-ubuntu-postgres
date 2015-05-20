@@ -5,12 +5,9 @@ Vagrant.configure(VAGRANTFILE_API_VERSION) do |config|
   config.vm.hostname = "postgresql"
   config.vm.box = "chef/ubuntu-14.10"
 
-  config.vm.network "private_network", ip: "192.168.33.50"
   config.vm.network "forwarded_port", guest: 5432, host: 5432
 
   config.vbguest.auto_update=false
-
-  config.vm.synced_folder "/Users/ystarikovich/VMShared", "/VMShared", owner: "postgres", group: "postgres"
   
   config.vm.provider "virtualbox" do |v|
     v.memory = 1024
