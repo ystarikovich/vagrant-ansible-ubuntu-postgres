@@ -1,0 +1,58 @@
+---
+- hosts: all
+  sudo: yes
+  vars:
+     packages:
+           - postgresql-{{ postgresql_verion }}
+           - python-psycopg2
+  tasks:
+    - name: adds vagrant to sudoers
+      lineinfile:
+            "dest=/etc/sudoers
+            line='vagrant ALL=(ALL) NOPASSWD: ALL'
+            state=present
+            validate='visudo -cf %s'"
+      tags:
+       - system
+ 
+    - name: ensure packages for postgreSQL is installed
+      apt:  
+            pkg={{item}}
+            state=present
+      with_items: 
+            packages
+      tags:
+        - postgres
+ 
+    - name: ensure upgrades are performed
+      apt:  upgrade=yes
+      tags:
+        - upgrade
+ 
+    - name: change listen_addresses to '*' in postgresql.conf
+      lineinfile: 
+            dest=/etc/postgresql/{{ postgresql_verion }}/main/postgresql.conf
+            regexp="^listen_addresses"
+            insertafter="^#listen_addresses"
+            line="listen_addresses = '*'"
+            state=present
+      notify:
+        - restart postgresql
+      tags:
+        - postgres
+ 
+    - name: change client in pg_hba.conf
+      lineinfile:
+            dest=/etc/postgresql/{{ postgresql_verion }}/main/pg_hba.conf
+            line="host all all 0.0.0.0/0 md5"
+            state=present
+      notify:
+        - restart postgresql
+      tags:
+        - postgres
+ 
+    - name: change postgres DB user password to align
+      sudo_user: postgres
+      postgresql_user: user=postgres password=align
+      tags:
+        - postgres
